@@ -3,6 +3,7 @@ import json
 import unittest
 
 from django.core.cache import cache
+from django.test.client import Client
 import httpretty
 import mock
 from nose.plugins.attrib import attr
@@ -195,3 +196,11 @@ class TestGetEdxApiData(ProgramsApiConfigMixin, CacheIsolationTestCase):
 
         self.assertTrue(mock_exception.called)
         self.assertEqual(actual, [])
+
+    @httpretty.activate
+    @mock.patch('edx_rest_api_client.client.EdxRestApiClient.__init__')
+    def test_client_passed(self, mock_init):
+        """Verify that when API client is passed edx_rest_api_client is not used"""
+        program_config = self.create_programs_config()
+        get_edx_api_data(program_config, self.user, 'orders', Client())
+        self.assertFalse(mock_init.called)
