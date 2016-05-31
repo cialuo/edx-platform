@@ -279,7 +279,10 @@ def submit_bulk_course_email(request, course_key, email_id):
     # We also pull out the targets argument here, so that is displayed in
     # the InstructorTask status.
     email_obj = CourseEmail.objects.get(id=email_id)
-    targets = [target.target_type for target in email_obj.targets.all()]
+    targets = [
+        target.short_display()
+        for target in email_obj.targets.all()
+    ]
 
     task_type = 'bulk_course_email'
     task_class = send_bulk_course_email

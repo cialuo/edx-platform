@@ -18,6 +18,8 @@ from django.test.utils import override_settings
 
 from bulk_email.models import Optout, BulkEmailFlag
 from bulk_email.tasks import _get_source_address
+from openedx.core.djangoapps.course_groups.models import CourseCohort
+from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort
 from courseware.tests.factories import StaffFactory, InstructorFactory
 from instructor_task.subtasks import update_subtask_status
 from student.roles import CourseStaffRole
@@ -200,6 +202,56 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
             [e.to[0] for e in mail.outbox],
             [self.instructor.email] + [s.email for s in self.staff]
         )
+
+    def test_send_to_cohort(self):
+        """
+        Make sure email sent to a cohort goes there.
+        """
+        cohort = CourseCohort.create(cohort_name='test cohort', course_id=self.course.id)
+        for student in self.students:
+            add_user_to_cohort(cohort.course_user_group, student.username)
+        # Now we know we have pulled up the instructor dash's email view
+        # (in the setUp method), we can test sending an email.
+        test_email = {
+            'action': 'Send email',
+            'send_to': '["cohort:{}"]'.format(cohort.course_user_group.name),
+            'subject': 'test subject for cohort',
+            'message': 'test message for cohort'
+        }
+        # Post the email to the instructor dashboard API
+        response = self.client.post(self.send_mail_url, test_email)
+        # from nose.tools import set_trace; set_trace()
+        self.assertEquals(json.loads(response.content), self.success_content)
+
+        self.assertEquals(len(mail.outbox), len(self.students))
+        self.assertItemsEqual(
+            [e.to[0] for e in mail.outbox],
+            [s.email for s in self.students]
+        )
+
+    def test_send_to_cohort_unenrolled(self):
+        """
+        Make sure email sent to a cohort does not go to unenrolled members of the cohort.
+        """
+        self.students.append(UserFactory())  # user will be added to cohort, but not enrolled in course
+        cohort = CourseCohort.create(cohort_name='test cohort', course_id=self.course.id)
+        for student in self.students:
+            add_user_to_cohort(cohort.course_user_group, student.username)
+        # Now we know we have pulled up the instructor dash's email view
+        # (in the setUp method), we can test sending an email.
+        test_email = {
+            'action': 'Send email',
+            'send_to': '["cohort:{}"]'.format(cohort.course_user_group.name),
+            'subject': 'test subject for cohort',
+            'message': 'test message for cohort'
+        }
+        # Post the email to the instructor dashboard API
+        response = self.client.post(self.send_mail_url, test_email)
+        # from nose.tools import set_trace; set_trace()
+        self.assertEquals(json.loads(response.content), self.success_content)
+
+        self.assertEquals(len(mail.outbox), len(self.students) - 1)
+        self.assertNotIn(self.students[-1].email, [e.to[0] for e in mail.outbox])
 
     def test_send_to_all(self):
         """

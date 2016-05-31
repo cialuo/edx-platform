@@ -10,7 +10,15 @@ from student.tests.factories import UserFactory
 from mock import patch, Mock
 from nose.plugins.attrib import attr
 
-from bulk_email.models import CourseEmail, SEND_TO_STAFF, CourseEmailTemplate, CourseAuthorization, BulkEmailFlag
+from bulk_email.models import (
+    CourseEmail,
+    SEND_TO_COHORT,
+    SEND_TO_STAFF,
+    CourseEmailTemplate,
+    CourseAuthorization,
+    BulkEmailFlag
+)
+from openedx.core.djangoapps.course_groups.models import CourseCohort
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
@@ -59,6 +67,20 @@ class CourseEmailTest(TestCase):
         html_message = "<html>dummy message</html>"
         with self.assertRaises(ValueError):
             CourseEmail.create(course_id, sender, to_option, subject, html_message)
+
+    def test_cohort_target(self):
+        course_id = SlashSeparatedCourseKey('abc', '123', 'doremi')
+        sender = UserFactory.create()
+        to_option = 'cohort:test cohort'
+        subject = "dummy subject"
+        html_message = "<html>dummy message</html>"
+        CourseCohort.create(cohort_name='test cohort', course_id=course_id)
+        email = CourseEmail.create(course_id, sender, [to_option], subject, html_message)
+        self.assertEquals(len(email.targets.all()), 1)
+        target = email.targets.all()[0]
+        self.assertEquals(target.target_type, SEND_TO_COHORT)
+        self.assertEquals(target.short_display(), 'cohort-test cohort')
+        self.assertEquals(target.long_display(), 'Cohort: test cohort')
 
 
 @attr('shard_1')
