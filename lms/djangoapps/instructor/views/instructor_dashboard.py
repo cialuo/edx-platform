@@ -422,7 +422,7 @@ def _section_course_info(course, access):
 
     if settings.ANALYTICS_DASHBOARD_URL:
         dashboard_link = _get_dashboard_link(course_key)
-        message = _("Enrollment data is now available in {dashboard_link}.").format(dashboard_link=dashboard_link)
+        message = Text(_("Enrollment data is now available in {dashboard_link}.")).format(dashboard_link=dashboard_link)
         section_data['enrollment_message'] = message
 
     if settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD'):
