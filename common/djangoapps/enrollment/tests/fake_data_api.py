@@ -68,7 +68,7 @@ def _get_fake_course_info(course_id, include_expired=False):
     # then remove the verified mode from the course.
     for course in _COURSES:
         if course_id == course['course_id']:
-            if _VERIFIED_MODE_EXPIRED and not include_expired:
+            if course_id in _VERIFIED_MODE_EXPIRED and not include_expired:
                 course['course_modes'] = [mode for mode in course['course_modes'] if mode['slug'] != 'verified']
             return course
 
@@ -103,9 +103,9 @@ def get_enrollment_attributes(user_id, course_id):
     return _ENROLLMENT_ATTRIBUTES
 
 
-def set_expired_mode():
-    """Set verified mode as expired."""
-    _VERIFIED_MODE_EXPIRED.append('verified')
+def set_expired_mode(course_id):
+    """Set course verified mode as expired."""
+    _VERIFIED_MODE_EXPIRED.append(course_id)
 
 
 def add_course(course_id, enrollment_start=None, enrollment_end=None, invite_only=False, course_modes=None):
