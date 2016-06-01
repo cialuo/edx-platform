@@ -6,7 +6,7 @@
  */
  var edx = edx || {};
 
- (function( $, _, _s, Backbone, gettext ) {
+ (function( $, _, _s, Backbone, gettext, HtmlUtils ) {
     'use strict';
 
     edx.verify_student = edx.verify_student || {};
@@ -40,7 +40,7 @@
         },
 
         render: function() {
-            var renderedTemplate = _.template($( this.templateId ).html())(
+            var renderedTemplate = HtmlUtils.template($( this.templateId ).html())(
                 {
                     courseKey: this.courseKey,
                     platformName: this.platformName
@@ -100,4 +100,4 @@
                 .attr('aria-disabled', !isEnabled);
         }
     });
-})(jQuery, _, _.str, Backbone, gettext);
+})(jQuery, _, _.str, Backbone, gettext, edx.HtmlUtils);
