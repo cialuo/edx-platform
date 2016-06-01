@@ -24,6 +24,9 @@ from base_studio_test import StudioCourseTest
 
 from test_studio_container import ContainerBase
 
+# @TODO: remove
+from flaky import flaky
+
 
 class SplitTestMixin(object):
     """
@@ -482,6 +485,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
             groups=["First Group", "Group C", "Group D"]
         )
 
+    @flaky(20, 20)
     def test_focus_management_in_experiment_group_inputs(self):
         """
         Scenario: Ensure that selecting the focus inputs in the groups list
