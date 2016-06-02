@@ -69,12 +69,13 @@ class BulkEmailTest(BaseInstructorDashboardTest):
         """
         Bulk email accessibility tests
         """
+        self.send_email_page.a11y_audit.config.set_scope([
+            '#section-send-email'
+        ])
         self.send_email_page.a11y_audit.config.set_rules({
             "ignore": [
                 'button-name',
-                'color-contrast',
                 'list',
-                'link-href',  # AC-415 will enable these
             ]
         })
         self.send_email_page.a11y_audit.check_for_accessibility_errors()
@@ -192,14 +193,10 @@ class AutoEnrollmentWithCSVTest(BaseInstructorDashboardTest):
         """
         Auto-enrollment with CSV accessibility tests
         """
-        self.auto_enroll_section.a11y_audit.config.set_rules({
-            "ignore": [
-                'data-table',
-                'duplicate-id',
-                'color-contrast',
-                'link-href',  # AC-415 will enable these
-            ]
-        })
+        self.auto_enroll_section.a11y_audit.config.set_scope([
+            '#member-list-widget-template'
+        ])
+        self.auto_enroll_section.a11y_audit.config.set_rules()
         self.auto_enroll_section.a11y_audit.check_for_accessibility_errors()
 
 
@@ -390,84 +387,6 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
         # And I can remove the attempt by clicking the "x" at the end of the row.
         exam_attempts_section.remove_student_attempt()
         self.assertFalse(exam_attempts_section.is_student_attempt_visible)
-
-    @attr('a11y')
-    def test_track_selection_a11y(self):
-        """
-        Proctored: Track selection accessibility tests
-        """
-        self.track_selection_page.a11y_audit.config.set_rules({
-            "ignore": [
-                'document-title',
-                'html-lang',
-            ]
-        })
-        self.track_selection_page.a11y_audit.check_for_accessibility_errors()
-
-    @attr('a11y')
-    def test_payment_verification_a11y(self):
-        """
-        Proctored: Payment verification accessibility tests
-        """
-        self.payment_and_verification_flow.a11y_audit.config.set_rules({
-            "ignore": [
-                'document-title',
-                'html-lang',
-            ]
-        })
-        self.payment_and_verification_flow.a11y_audit.check_for_accessibility_errors()
-
-    @attr('a11y')
-    def test_immediate_verification_a11y(self):
-        """
-        Proctored: Immediate verification accessibility tests
-        """
-        self.immediate_verification_page.a11y_audit.config.set_rules({
-            "ignore": [
-                'document-title',
-                'html-lang',
-            ]
-        })
-        self.immediate_verification_page.a11y_audit.check_for_accessibility_errors()
-
-    @attr('a11y')
-    def test_upgrade_a11y(self):
-        """
-        Proctored: Upgrade page accessibility tests
-        """
-        self.upgrade_page.a11y_audit.config.set_rules({
-            "ignore": [
-                'document-title',
-                'html-lang'
-            ]
-        })
-        self.upgrade_page.a11y_audit.check_for_accessibility_errors()
-
-    @attr('a11y')
-    def test_fake_payment_a11y(self):
-        """
-        Proctored: Fake payment page accessibility tests
-        """
-        self.fake_payment_page.a11y_audit.config.set_rules({
-            "ignore": [
-                'document-title',
-                'html-lang',
-            ]
-        })
-        self.fake_payment_page.a11y_audit.check_for_accessibility_errors()
-
-    @attr('a11y')
-    def test_problem_a11y(self):
-        """
-        Proctored: Problem page accessibility tests
-        """
-        self.problem_page.a11y_audit.config.set_rules({
-            "ignore": [
-                'document-title',
-                'html-lang',
-            ]
-        })
-        self.problem_page.a11y_audit.check_for_accessibility_errors()
 
 
 @attr('shard_7')
@@ -668,18 +587,6 @@ class EntranceExamGradeTest(BaseInstructorDashboardTest):
         self.student_admin_section.click_task_history_button()
         self.assertTrue(self.student_admin_section.is_background_task_history_table_visible())
 
-    @attr('a11y')
-    def test_entrance_exam_test_a11y(self):
-        """
-        Entrance exam accessibility tests
-        """
-        self.student_admin_section.a11y_audit.config.set_rules({
-            "ignore": [
-                'link-href',  # AC-415 will enable these
-            ]
-        })
-        self.student_admin_section.a11y_audit.check_for_accessibility_errors()
-
 
 @attr('shard_7')
 class DataDownloadsTest(BaseInstructorDashboardTest):
@@ -793,11 +700,10 @@ class DataDownloadsTest(BaseInstructorDashboardTest):
         """
         Data download page accessibility tests
         """
-        self.data_download_section.a11y_audit.config.set_rules({
-            "ignore": [
-                'link-href',  # AC-415 will enable these
-            ]
-        })
+        self.data_download_section.a11y_audit.config.set_scope([
+            '.data-download-container'
+        ])
+        self.data_download_section.a11y_audit.config.set_rules()
         self.data_download_section.a11y_audit.check_for_accessibility_errors()
 
 
@@ -1093,6 +999,9 @@ class CertificatesTest(BaseInstructorDashboardTest):
         """
         Certificates page accessibility tests
         """
+        self.certificates_section.a11y_audit.config.set_scope([
+            '.certificates-wrapper'
+        ])
         self.certificates_section.a11y_audit.config.set_rules({
             "ignore": [
                 'aria-valid-attr-value',
@@ -1101,7 +1010,6 @@ class CertificatesTest(BaseInstructorDashboardTest):
                 'duplicate-id',
                 'label',
                 'radiogroup',
-                'link-href',  # AC-415 will enable these
             ]
         })
         self.certificates_section.a11y_audit.check_for_accessibility_errors()
@@ -1310,6 +1218,9 @@ class CertificateInvalidationTest(BaseInstructorDashboardTest):
         """
         Certificate invalidation accessibility tests
         """
+        self.certificates_section.a11y_audit.config.set_scope([
+            '.certificates-wrapper'
+        ])
         self.certificates_section.a11y_audit.config.set_rules({
             "ignore": [
                 'aria-valid-attr-value',
@@ -1318,9 +1229,6 @@ class CertificateInvalidationTest(BaseInstructorDashboardTest):
                 'duplicate-id',
                 'label',
                 'radiogroup',
-                'table',
-                'data-table',
-                'link-href',  # AC-415 will enable these
             ]
         })
         self.certificates_section.a11y_audit.check_for_accessibility_errors()
