@@ -163,7 +163,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
 
         for mode in (
                 CourseMode.AUDIT, CourseMode.PROFESSIONAL, CourseMode.CREDIT_MODE,
-                CourseMode.NO_ID_PROFESSIONAL_MODE, CourseMode.VERIFIED
+                CourseMode.NO_ID_PROFESSIONAL_MODE, CourseMode.VERIFIED, CourseMode.HONOR
         ):
             CourseModeFactory.create(mode_slug=mode, course_id=self.course.id)  # pylint: disable=no-member
 
@@ -203,7 +203,8 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
             'verified_upgrade_deadline': None,
         }, data[0])
         self.assertEqual(
-            {CourseMode.VERIFIED, CourseMode.AUDIT, CourseMode.NO_ID_PROFESSIONAL_MODE, CourseMode.PROFESSIONAL},
+            {CourseMode.VERIFIED, CourseMode.AUDIT, CourseMode.HONOR,
+             CourseMode.NO_ID_PROFESSIONAL_MODE, CourseMode.PROFESSIONAL},
             {mode['slug'] for mode in data[0]['course_modes']}
         )
 
@@ -273,51 +274,41 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         self.assert_enrollment(CourseMode.AUDIT)
         self.assertIsNone(ManualEnrollmentAudit.get_manual_enrollment_by_email(self.student.email))
 
-    @ddt.data('username', 'email')
-    def test_enrollments_with_expired_mode(self, search_string_type):
-        """ Verify that verified mode with expired date will appear on support page. """
-        # Change verified mode expiration.
-        verified_mode = CourseMode.objects.get(course_id=self.course.id, mode_slug=CourseMode.VERIFIED)
-        verified_mode.expiration_datetime = datetime(year=1970, month=1, day=1, tzinfo=UTC)
-        verified_mode.save()
+    @ddt.data('honor', 'audit', 'verified', 'professional', 'no-id-professional')
+    def test_update_enrollment_for_all_modes(self, new_mode):
+        # Verify support can changed the enrollment to all available modes except credit.
+        self.assert_update_enrollment('username', new_mode)
 
+    @ddt.data('honor', 'audit', 'verified', 'professional', 'no-id-professional')
+    def test_update_enrollment_for_ended_course(self, new_mode):
+        # Verify support can changed the enrollment of archived course.
+        self.set_course_end_date_and_expiry()
+        self.assert_update_enrollment('username', new_mode)
+
+    def test_update_enrollment_with_credit_mode_throws_error(self):
+        # Verify that enrollment cannot be changed to credit mode.
+        self.assert_update_enrollment('username', CourseMode.CREDIT_MODE)
+
+    @ddt.data('username', 'email')
+    def test_get_enrollments_with_expired_mode(self, search_string_type):
+        """ Verify that page can get the all modes with archived course. """
+        self.set_course_end_date_and_expiry()
         url = reverse(
             'support:enrollment_list',
             kwargs={'username_or_email': getattr(self.student, search_string_type)}
         )
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
-        self.assertEqual(len(data), 1)
+        self._assert_generated_modes(response)
 
-        self.assertEqual(
-            self._generate_modes_data(),
-            data[0]['course_modes']
-        )
-
-        self.assertEqual(
-            {CourseMode.VERIFIED, CourseMode.AUDIT, CourseMode.NO_ID_PROFESSIONAL_MODE, CourseMode.PROFESSIONAL},
-            {mode['slug'] for mode in data[0]['course_modes']}
-        )
-
-        # check the post method with expired mode
+    @ddt.data('username', 'email')
+    def test_update_enrollments_with_expired_mode(self, search_string_type):
+        """ Verify that enrollment can be updated to verified mode. """
+        self.set_course_end_date_and_expiry()
         self.assertIsNone(ManualEnrollmentAudit.get_manual_enrollment_by_email(self.student.email))
-        url = reverse(
-            'support:enrollment_list',
-            kwargs={'username_or_email': getattr(self.student, search_string_type)}
-        )
-        response = self.client.post(url, data={
-            'course_id': unicode(self.course.id),  # pylint: disable=no-member
-            'old_mode': CourseMode.AUDIT,
-            'new_mode': CourseMode.VERIFIED,
-            'reason': 'Financial Assistance'
-        })
-        self.assertEqual(response.status_code, 200)
-        self.assertIsNotNone(ManualEnrollmentAudit.get_manual_enrollment_by_email(self.student.email))
-        self.assert_enrollment(CourseMode.VERIFIED)
+        self.assert_update_enrollment(search_string_type, CourseMode.VERIFIED)
 
-    def _generate_modes_data(self):
-        """ Generate course modes dict """
+    def _assert_generated_modes(self, response):
+        # Dry method to generate course modes dict and test with response data.
         modes = CourseMode.modes_for_course(self.course.id, include_expired=True)  # pylint: disable=no-member
         modes_data = []
         for mode in modes:
@@ -334,4 +325,48 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
                 'description': mode.description
             })
 
-        return modes_data
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertEqual(len(data), 1)
+
+        self.assertEqual(
+            modes_data,
+            data[0]['course_modes']
+        )
+
+        self.assertEqual(
+            {CourseMode.VERIFIED, CourseMode.AUDIT, CourseMode.NO_ID_PROFESSIONAL_MODE,
+             CourseMode.PROFESSIONAL, CourseMode.HONOR},
+            {mode['slug'] for mode in data[0]['course_modes']}
+        )
+
+    def assert_update_enrollment(self, search_string_type, new_mode):
+        # Dry method to update the enrollment and assert response.
+        self.assertIsNone(ManualEnrollmentAudit.get_manual_enrollment_by_email(self.student.email))
+        url = reverse(
+            'support:enrollment_list',
+            kwargs={'username_or_email': getattr(self.student, search_string_type)}
+        )
+        response = self.client.post(url, data={
+            'course_id': unicode(self.course.id),  # pylint: disable=no-member
+            'old_mode': CourseMode.AUDIT,
+            'new_mode': new_mode,
+            'reason': 'Financial Assistance'
+        })
+        # Enrollment cannot be changed to credit mode.
+        if new_mode == CourseMode.CREDIT_MODE:
+            self.assertEqual(response.status_code, 400)
+        else:
+            self.assertEqual(response.status_code, 200)
+            self.assertIsNotNone(ManualEnrollmentAudit.get_manual_enrollment_by_email(self.student.email))
+            self.assert_enrollment(new_mode)
+
+    def set_course_end_date_and_expiry(self):
+        # Set the course-end date and expire its verified mode.
+        self.course.start = datetime(year=1970, month=1, day=1, tzinfo=UTC)
+        self.course.end = datetime(year=1970, month=1, day=10, tzinfo=UTC)
+
+        # change verified mode expiry.
+        verified_mode = CourseMode.objects.get(course_id=self.course.id, mode_slug=CourseMode.VERIFIED)
+        verified_mode.expiration_datetime = datetime(year=1970, month=1, day=9, tzinfo=UTC)
+        verified_mode.save()
