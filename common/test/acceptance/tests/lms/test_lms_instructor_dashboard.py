@@ -57,14 +57,10 @@ class LMSInstructorDashboardA11yTest(BaseInstructorDashboardTest):
         self.instructor_dashboard_page = self.visit_instructor_dashboard()
 
     def test_instructor_dashboard_a11y(self):
-        # a11y test added on 2 Jun 2016, but mostly disabled as there's a slew
-        # of issues on the Instructor Dashboard. We should aim to resolve these
-        # before 2 October 2016, and include the below exclusions.
-        self.instructor_dashboard_page.a11y_audit.config.set_scope()
         self.instructor_dashboard_page.a11y_audit.config.set_rules({
             "ignore": [
-                'link-href',
-                'data-table',
+                'link-href',  # TODO: ssbbart
+                'data-table',  # TODO: ssbbart
             ]
         })
         self.instructor_dashboard_page.a11y_audit.check_for_accessibility_errors()
@@ -98,8 +94,9 @@ class BulkEmailTest(BaseInstructorDashboardTest):
         ])
         self.send_email_page.a11y_audit.config.set_rules({
             "ignore": [
-                'button-name',
-                'list',
+                'button-name',  # TODO: ssbbart
+                'list',  # TODO: ssbbart,
+                'color-contrast',  # TODO: ssbbart
             ]
         })
         self.send_email_page.a11y_audit.check_for_accessibility_errors()
@@ -220,7 +217,6 @@ class AutoEnrollmentWithCSVTest(BaseInstructorDashboardTest):
         self.auto_enroll_section.a11y_audit.config.set_scope([
             '#member-list-widget-template'
         ])
-        self.auto_enroll_section.a11y_audit.config.set_rules()
         self.auto_enroll_section.a11y_audit.check_for_accessibility_errors()
 
 
@@ -727,7 +723,6 @@ class DataDownloadsTest(BaseInstructorDashboardTest):
         self.data_download_section.a11y_audit.config.set_scope([
             '.data-download-container'
         ])
-        self.data_download_section.a11y_audit.config.set_rules()
         self.data_download_section.a11y_audit.check_for_accessibility_errors()
 
 
@@ -1028,12 +1023,12 @@ class CertificatesTest(BaseInstructorDashboardTest):
         ])
         self.certificates_section.a11y_audit.config.set_rules({
             "ignore": [
-                'aria-valid-attr-value',
-                'checkboxgroup',
-                'color-contrast',
-                'duplicate-id',
-                'label',
-                'radiogroup',
+                'aria-valid-attr-value',  # TODO: ssbbart
+                'checkboxgroup',  # TODO: ssbbart
+                'color-contrast',  # TODO: ssbbart
+                'duplicate-id',  # TODO: ssbbart
+                'label',  # TODO: ssbbart
+                'radiogroup',  # TODO: ssbbart
             ]
         })
         self.certificates_section.a11y_audit.check_for_accessibility_errors()
@@ -1247,12 +1242,12 @@ class CertificateInvalidationTest(BaseInstructorDashboardTest):
         ])
         self.certificates_section.a11y_audit.config.set_rules({
             "ignore": [
-                'aria-valid-attr-value',
-                'checkboxgroup',
-                'color-contrast',
-                'duplicate-id',
-                'label',
-                'radiogroup',
+                'aria-valid-attr-value',  # TODO: ssbbart
+                'checkboxgroup',  # TODO: ssbbart
+                'color-contrast',  # TODO: ssbbart
+                'duplicate-id',  # TODO: ssbbart
+                'label',  # TODO: ssbbart
+                'radiogroup',  # TODO: ssbbart
             ]
         })
         self.certificates_section.a11y_audit.check_for_accessibility_errors()
