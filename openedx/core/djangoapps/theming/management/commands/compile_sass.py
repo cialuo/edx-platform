@@ -87,7 +87,7 @@ class Command(BaseCommand):
         # (theme name would be invalid if it does not exist in themes directory)
         elif (not set(given_themes).issubset(available_themes.keys())) and is_comprehensive_theming_enabled():
             raise CommandError(
-                "Given themes '{themes}' do not exist inside any if the theme directories '{theme_dirs}'".format(
+                "Given themes '{themes}' do not exist inside any of the theme directories '{theme_dirs}'".format(
                     themes=", ".join(set(given_themes) - set(available_themes.keys())),
                     theme_dirs=get_theme_base_dirs(),
                 ),

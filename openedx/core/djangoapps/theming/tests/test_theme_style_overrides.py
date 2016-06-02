@@ -229,7 +229,8 @@ def compile_sass(system):
         'pavelib.assets.update_assets',
         args=(
             system,
-            "--themes_dir={}".format(settings.TEST_THEME.dirname()),
+            "--theme-dirs={}".format(settings.TEST_THEME.dirname()),
             "--themes={}".format(settings.TEST_THEME.basename()),
-            "--settings=test"),
+            "--skip-collect",
+        ),
     )

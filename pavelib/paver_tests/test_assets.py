@@ -97,7 +97,7 @@ class TestPaverThemeAssetTasks(PaverTestCase):
         self.reset_task_messages()
         call_task(
             'pavelib.assets.compile_sass',
-            options={"system": system, "debug": debug, "force": force, "themes_dir": TEST_THEME.dirname(),
+            options={"system": system, "debug": debug, "force": force, "theme-dirs": [TEST_THEME.dirname()],
                      "themes": [TEST_THEME.basename()]},
         )
         expected_messages = []
@@ -193,7 +193,7 @@ class TestPaverWatchAssetTasks(TestCase):
             with patch('pavelib.assets.PollingObserver.start'):
                 call_task(
                     'pavelib.assets.watch_assets',
-                    options={"background": True, "themes_dir": TEST_THEME.dirname(),
+                    options={"background": True, "theme-dirs": [TEST_THEME.dirname()],
                              "themes": [TEST_THEME.basename()]},
                 )
                 self.assertEqual(mock_register.call_count, 2)

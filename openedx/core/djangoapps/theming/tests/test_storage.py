@@ -10,7 +10,7 @@ from mock import patch
 from django.test import TestCase, override_settings
 from django.conf import settings
 
-from openedx.core.djangoapps.theming.helpers import get_theme_base_dirs, Theme
+from openedx.core.djangoapps.theming.helpers import get_theme_base_dirs, Theme, get_theme_base_dir
 from openedx.core.djangoapps.theming.storage import ThemeStorage
 
 
@@ -53,7 +53,7 @@ class TestStorageLMS(TestCase):
         """
         with patch(
             "openedx.core.djangoapps.theming.storage.get_current_theme",
-            return_value=Theme(self.enabled_theme, self.enabled_theme),
+            return_value=Theme(self.enabled_theme, self.enabled_theme, get_theme_base_dir(self.enabled_theme)),
         ):
             asset_url = self.storage.url(asset)
             # remove hash key from file url
@@ -74,7 +74,7 @@ class TestStorageLMS(TestCase):
         """
         with patch(
             "openedx.core.djangoapps.theming.storage.get_current_theme",
-            return_value=Theme(self.enabled_theme, self.enabled_theme),
+            return_value=Theme(self.enabled_theme, self.enabled_theme, get_theme_base_dir(self.enabled_theme)),
         ):
             returned_path = self.storage.path(asset)
             expected_path = self.themes_dir / self.enabled_theme / "lms/static/" / asset

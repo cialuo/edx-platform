@@ -6,7 +6,7 @@ from django.conf import settings
 
 from openedx.core.djangoapps.theming.test_util import with_comprehensive_theme
 from openedx.core.djangoapps.theming.helpers import get_template_path_with_theme, strip_site_theme_templates_path, \
-    get_themes, Theme
+    get_themes, Theme, get_theme_base_dir
 
 
 class TestHelpers(TestCase):
@@ -17,10 +17,10 @@ class TestHelpers(TestCase):
         Tests template paths are returned from enabled theme.
         """
         expected_themes = [
-            Theme('red-theme', 'red-theme'),
-            Theme('edge.edx.org', 'edge.edx.org'),
-            Theme('edx.org', 'edx.org'),
-            Theme('stanford-style', 'stanford-style'),
+            Theme('red-theme', 'red-theme', get_theme_base_dir('red-theme')),
+            Theme('edge.edx.org', 'edge.edx.org', get_theme_base_dir('edge.edx.org')),
+            Theme('edx.org', 'edx.org', get_theme_base_dir('edx.org')),
+            Theme('stanford-style', 'stanford-style', get_theme_base_dir('stanford-style')),
         ]
         actual_themes = get_themes()
         self.assertItemsEqual(expected_themes, actual_themes)
@@ -31,7 +31,7 @@ class TestHelpers(TestCase):
         Tests template paths are returned from enabled theme.
         """
         expected_themes = [
-            Theme('test-theme', 'test-theme'),
+            Theme('test-theme', 'test-theme', get_theme_base_dir('test-theme')),
         ]
         actual_themes = get_themes()
         self.assertItemsEqual(expected_themes, actual_themes)
@@ -47,7 +47,7 @@ class TestHelpersLMS(TestCase):
         Tests template paths are returned from enabled theme.
         """
         template_path = get_template_path_with_theme('header.html')
-        self.assertEqual(template_path, '/red-theme/lms/templates/header.html')
+        self.assertEqual(template_path, 'red-theme/lms/templates/header.html')
 
     @with_comprehensive_theme('red-theme')
     def test_get_template_path_with_theme_for_missing_template(self):
@@ -90,7 +90,7 @@ class TestHelpersCMS(TestCase):
         Tests template paths are returned from enabled theme.
         """
         template_path = get_template_path_with_theme('login.html')
-        self.assertEqual(template_path, '/red-theme/cms/templates/login.html')
+        self.assertEqual(template_path, 'red-theme/cms/templates/login.html')
 
     @with_comprehensive_theme('red-theme')
     def test_get_template_path_with_theme_for_missing_template(self):

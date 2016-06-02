@@ -53,7 +53,7 @@ class TestComprehensiveTheming(TestCase):
         with open(template_dir / "footer.html", "w") as footer:
             footer.write("<footer>TEMPORARY THEME</footer>")
 
-        dest_path = path(settings.COMPREHENSIVE_THEME_DIRS) / tmp_theme
+        dest_path = path(settings.COMPREHENSIVE_THEME_DIRS[0]) / tmp_theme
         create_symlink(themes_dir / tmp_theme, dest_path)
 
         @with_comprehensive_theme(tmp_theme)
@@ -66,22 +66,6 @@ class TestComprehensiveTheming(TestCase):
         do_the_test(self)
         # remove symlinks before running subsequent tests
         delete_symlink(dest_path)
-
-    def test_theme_adjusts_staticfiles_search_path(self):
-        """
-        Tests theme directories are added to  staticfiles search path.
-        """
-        before_finders = list(settings.STATICFILES_FINDERS)
-        before_dirs = list(settings.STATICFILES_DIRS)
-
-        @with_comprehensive_theme('red-theme')
-        def do_the_test(self):
-            """A function to do the work so we can use the decorator."""
-            self.assertEqual(list(settings.STATICFILES_FINDERS), before_finders)
-            self.assertIn(settings.REPO_ROOT / 'themes/red-theme/lms/static', settings.STATICFILES_DIRS)
-            self.assertEqual(settings.STATICFILES_DIRS, before_dirs)
-
-        do_the_test(self)
 
     def test_default_logo_image(self):
         result = staticfiles.finders.find('images/logo.png')
@@ -146,7 +130,6 @@ def compile_sass(system):
         'pavelib.assets.update_assets',
         args=(
             system,
-            "--themes_dir={themes_dir}".format(themes_dir=settings.COMPREHENSIVE_THEME_DIRS),
             "--themes=red-theme",
-            "--settings=test"),
+            "--skip-collect"),
     )
