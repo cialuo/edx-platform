@@ -86,7 +86,7 @@ from openedx.core.djangolib.markup import HTML, Text
                     <input type="button" id="disabled-btn-start-generating-certificates" class="is-disabled" aria-disabled="true" value="${_('Generate Certificates')}"/>
                 % else:
                     <p class="under-heading">
-                        ${Text(_("When you are ready to generate certificates for your course, click Generate Certificates. You do not need to do this if you have set the certificate mode to on-demand generation."))}
+                        ${_("When you are ready to generate certificates for your course, click Generate Certificates. You do not need to do this if you have set the certificate mode to on-demand generation.")}
                     </p>
                     <input type="button" class="btn-blue" id="btn-start-generating-certificates" value="${_('Generate Certificates')}" data-endpoint="${section_data['urls']['start_certificate_generation']}"/>
                 %endif
