@@ -59,8 +59,8 @@ class LMSInstructorDashboardA11yTest(BaseInstructorDashboardTest):
     def test_instructor_dashboard_a11y(self):
         self.instructor_dashboard_page.a11y_audit.config.set_rules({
             "ignore": [
-                'link-href',  # TODO: ssbbart
-                'data-table',  # TODO: ssbbart
+                'link-href',  # TODO: wcag2aa
+                'data-table',  # TODO: wcag2aa
             ]
         })
         self.instructor_dashboard_page.a11y_audit.check_for_accessibility_errors()
@@ -94,9 +94,9 @@ class BulkEmailTest(BaseInstructorDashboardTest):
         ])
         self.send_email_page.a11y_audit.config.set_rules({
             "ignore": [
-                'button-name',  # TODO: ssbbart
-                'list',  # TODO: ssbbart,
-                'color-contrast',  # TODO: ssbbart
+                'button-name',  # TODO: wcag2aa
+                'list',  # TODO: wcag2aa,
+                'color-contrast',  # TODO: wcag2aa
             ]
         })
         self.send_email_page.a11y_audit.check_for_accessibility_errors()
@@ -1023,12 +1023,12 @@ class CertificatesTest(BaseInstructorDashboardTest):
         ])
         self.certificates_section.a11y_audit.config.set_rules({
             "ignore": [
-                'aria-valid-attr-value',  # TODO: ssbbart
-                'checkboxgroup',  # TODO: ssbbart
-                'color-contrast',  # TODO: ssbbart
-                'duplicate-id',  # TODO: ssbbart
-                'label',  # TODO: ssbbart
-                'radiogroup',  # TODO: ssbbart
+                'aria-valid-attr-value',  # TODO: wcag2aa
+                'checkboxgroup',  # TODO: wcag2aa
+                'color-contrast',  # TODO: wcag2aa
+                'duplicate-id',  # TODO: wcag2aa
+                'label',  # TODO: wcag2aa
+                'radiogroup',  # TODO: wcag2aa
             ]
         })
         self.certificates_section.a11y_audit.check_for_accessibility_errors()
@@ -1242,12 +1242,12 @@ class CertificateInvalidationTest(BaseInstructorDashboardTest):
         ])
         self.certificates_section.a11y_audit.config.set_rules({
             "ignore": [
-                'aria-valid-attr-value',  # TODO: ssbbart
-                'checkboxgroup',  # TODO: ssbbart
-                'color-contrast',  # TODO: ssbbart
-                'duplicate-id',  # TODO: ssbbart
-                'label',  # TODO: ssbbart
-                'radiogroup',  # TODO: ssbbart
+                'aria-valid-attr-value',  # TODO: wcag2aa
+                'checkboxgroup',  # TODO: wcag2aa
+                'color-contrast',  # TODO: wcag2aa
+                'duplicate-id',  # TODO: wcag2aa
+                'label',  # TODO: wcag2aa
+                'radiogroup',  # TODO: wcag2aa
             ]
         })
         self.certificates_section.a11y_audit.check_for_accessibility_errors()
