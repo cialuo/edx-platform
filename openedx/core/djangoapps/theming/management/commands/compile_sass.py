@@ -33,15 +33,6 @@ class Command(BaseCommand):
 
         # Named (optional) arguments
         parser.add_argument(
-            '--theme-dirs',
-            dest='theme_dirs',
-            type=str,
-            nargs='+',
-            default=get_theme_base_dirs(),
-            help="List of themes whose sass need to compiled. Or 'no'/'all' to compile for no/all themes.",
-        )
-
-        parser.add_argument(
             '--themes',
             type=str,
             nargs='+',
@@ -81,11 +72,11 @@ class Command(BaseCommand):
         """
         system = options.get("system", ALL_SYSTEMS)
         given_themes = options.get("themes", ["all"])
-        theme_dirs = options.get("theme_dirs", get_theme_base_dirs())
 
         force = options.get("force", True)
         debug = options.get("debug", True)
 
+        theme_dirs = get_theme_base_dirs()
         available_themes = {t.theme_dir_name: t for t in get_themes()}
 
         if 'no' in given_themes or 'all' in given_themes:
@@ -98,7 +89,7 @@ class Command(BaseCommand):
             raise CommandError(
                 "Given themes '{themes}' do not exist inside any if the theme directories '{theme_dirs}'".format(
                     themes=", ".join(set(given_themes) - set(available_themes.keys())),
-                    theme_dirs=theme_dirs,
+                    theme_dirs=get_theme_base_dirs(),
                 ),
             )
 
@@ -107,8 +98,8 @@ class Command(BaseCommand):
         elif "no" in given_themes:
             themes = []
         else:
-            # convert theme names to Theme objects
-            themes = [available_themes.get(theme) for theme in given_themes]
+            # convert theme names to Theme objects, this will remove all themes if theming is disabled
+            themes = [available_themes.get(theme) for theme in given_themes if theme in available_themes]
 
         return system, theme_dirs, themes, force, debug
 
@@ -118,6 +109,12 @@ class Command(BaseCommand):
         """
         system, theme_dirs, themes, force, debug = self.parse_arguments(*args, **options)
         themes = [theme.theme_dir_name for theme in themes]
+
+        if options.get("themes", None) and not is_comprehensive_theming_enabled():
+            # log a warning message to let the user know that asset compilation for themes is skipped
+            self.stdout.write(
+                self.style.WARNING("Skipping theme asset compilation: enable theming to process themed assets"),
+            )
 
         call_task(
             'pavelib.assets.compile_sass',

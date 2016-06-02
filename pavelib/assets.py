@@ -507,9 +507,9 @@ def compile_sass(options):
             print(">> {} -> {} in {}s".format(sass_dir, css_dir, duration))
 
     if compilation_results['success']:
-        print("\033[92m\n\nSuccessful compilations:\n--- " + "\n--- ".join(compilation_results['success']) + "\033[00m")
+        print("\033[92m\nSuccessful compilations:\n--- " + "\n--- ".join(compilation_results['success']) + "\n\033[00m")
     if compilation_results['failure']:
-        print("\033[91m\n\nFailed compilations:\n--- " + "\n--- ".join(compilation_results['failure']) + "\033[00m")
+        print("\033[91m\nFailed compilations:\n--- " + "\n--- ".join(compilation_results['failure']) + "\n\033[00m")
 
 
 def _compile_sass(system, theme, debug, force, timing_info):
@@ -657,7 +657,6 @@ def execute_compile_sass(args):
     for sys in args.system:
         options = ""
         options += " --themes " + " ".join(args.themes) if args.themes else ""
-        options += " --theme-dirs " + " ".join(args.theme_dirs) if args.theme_dirs else ""
         options += " --debug" if args.debug else ""
 
         sh(
@@ -691,7 +690,7 @@ def watch_assets(options):
 
     if not theme_dirs and themes:
         # We can not add theme sass watchers without knowing the directory that contains the themes.
-        raise ValueError('theme_dirs must be provided for compiling theme sass.')
+        raise ValueError('theme-dirs must be provided for watching theme sass.')
     else:
         theme_dirs = [path(_dir) for _dir in theme_dirs]
 

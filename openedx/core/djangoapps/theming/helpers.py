@@ -198,7 +198,7 @@ def get_current_site_theme():
 
 def get_current_theme():
     """
-    Return current site theme object. Returns None if theming is disabled.
+    Return current theme object. Returns None if theming is disabled.
 
     Returns:
          (ecommerce.theming.models.SiteTheme): site theme object for the current site.
@@ -224,7 +224,7 @@ def get_current_theme():
 
 def get_theme_base_dir(theme_dir_name, suppress_error=False):
     """
-    Returns absolute path to the directory that contains the given theme dir.
+    Returns absolute path to the directory that contains the given theme.
 
     Args:
         theme_dir_name (str): theme directory name to get base path for
@@ -284,6 +284,10 @@ def get_theme_base_dirs():
     Returns:
          (Path): Base theme directory path
     """
+    # Return an empty list if theming is disabled
+    if not is_comprehensive_theming_enabled():
+        return []
+
     theme_dirs = settings.COMPREHENSIVE_THEME_DIRS
 
     if not isinstance(theme_dirs, list):
