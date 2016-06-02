@@ -269,17 +269,17 @@ class EnrollmentTest(CacheIsolationTestCase):
         self.assert_update_enrollment(mode='verified', is_active=False, include_expired=include_expired)
 
     def add_course_modes(self, modes):
-        # Dry method for adding fake course enrollment information to the fake data API
+        """ Dry method for adding fake course enrollment information to the fake data API."""
         fake_data_api.add_course(self.COURSE_ID, course_modes=modes)
 
     def assert_add_enrollment(self, mode):
-        # Dry method for making enrollment and check the reponse
+        """ Dry method for making enrollment and check the reponse."""
         result = api.add_enrollment(self.USERNAME, self.COURSE_ID, mode=mode)
         get_result = api.get_enrollment(self.USERNAME, self.COURSE_ID)
         self.assertEquals(result, get_result)
 
     def assert_update_enrollment(self, mode, is_active=True, include_expired=False):
-        # Dry method for updating enrollment.
+        """ Dry method for updating enrollment."""
 
         result = api.update_enrollment(
             self.USERNAME, self.COURSE_ID, mode=mode, is_active=is_active, include_expired=include_expired

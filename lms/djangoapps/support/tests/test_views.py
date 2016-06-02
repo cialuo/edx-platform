@@ -308,7 +308,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         self.assert_update_enrollment(search_string_type, CourseMode.VERIFIED)
 
     def _assert_generated_modes(self, response):
-        # Dry method to generate course modes dict and test with response data.
+        """Dry method to generate course modes dict and test with response data."""
         modes = CourseMode.modes_for_course(self.course.id, include_expired=True)  # pylint: disable=no-member
         modes_data = []
         for mode in modes:
@@ -341,7 +341,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         )
 
     def assert_update_enrollment(self, search_string_type, new_mode):
-        # Dry method to update the enrollment and assert response.
+        """ Dry method to update the enrollment and assert response."""
         self.assertIsNone(ManualEnrollmentAudit.get_manual_enrollment_by_email(self.student.email))
         url = reverse(
             'support:enrollment_list',
@@ -362,7 +362,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
             self.assert_enrollment(new_mode)
 
     def set_course_end_date_and_expiry(self):
-        # Set the course-end date and expire its verified mode.
+        """ Set the course-end date and expire its verified mode."""
         self.course.start = datetime(year=1970, month=1, day=1, tzinfo=UTC)
         self.course.end = datetime(year=1970, month=1, day=10, tzinfo=UTC)
 
