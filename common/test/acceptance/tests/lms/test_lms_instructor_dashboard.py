@@ -45,6 +45,7 @@ class BaseInstructorDashboardTest(EventsTestMixin, UniqueCourseTest):
         instructor_dashboard_page.visit()
         return instructor_dashboard_page
 
+
 @attr('a11y')
 class LMSInstructorDashboardA11yTest(BaseInstructorDashboardTest):
     """
@@ -1242,6 +1243,7 @@ class CertificateInvalidationTest(BaseInstructorDashboardTest):
         ])
         self.certificates_section.a11y_audit.config.set_rules({
             "ignore": [
+                'data-table',  # TODO: wcag2aa
                 'aria-valid-attr-value',  # TODO: wcag2aa
                 'checkboxgroup',  # TODO: wcag2aa
                 'color-contrast',  # TODO: wcag2aa
