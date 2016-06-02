@@ -197,7 +197,6 @@ class TestGetEdxApiData(ProgramsApiConfigMixin, CacheIsolationTestCase):
         self.assertTrue(mock_exception.called)
         self.assertEqual(actual, [])
 
-    @httpretty.activate
     @mock.patch('edx_rest_api_client.client.EdxRestApiClient.__init__')
     def test_client_passed(self, mock_init):
         """Verify that when API client is passed edx_rest_api_client is not used"""
