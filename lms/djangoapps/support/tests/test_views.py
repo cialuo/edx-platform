@@ -367,6 +367,9 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         self.course.end = datetime(year=1970, month=1, day=10, tzinfo=UTC)
 
         # change verified mode expiry.
-        verified_mode = CourseMode.objects.get(course_id=self.course.id, mode_slug=CourseMode.VERIFIED)
+        verified_mode = CourseMode.objects.get(
+            course_id=self.course.id,   # pylint: disable=no-member
+            mode_slug=CourseMode.VERIFIED
+        )
         verified_mode.expiration_datetime = datetime(year=1970, month=1, day=9, tzinfo=UTC)
         verified_mode.save()
