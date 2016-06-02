@@ -574,7 +574,6 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
                         log.exception(exception_message)
                         raise
 
-
         for source in self.html5_sources:
             ele = etree.Element('source')
             ele.set('src', source)
