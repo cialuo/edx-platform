@@ -162,7 +162,8 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         self.student = UserFactory.create(username='student', email='test@example.com', password='test')
 
         for mode in (
-                CourseMode.AUDIT, CourseMode.PROFESSIONAL, CourseMode.NO_ID_PROFESSIONAL_MODE, CourseMode.VERIFIED
+                CourseMode.AUDIT, CourseMode.PROFESSIONAL, CourseMode.CREDIT_MODE,
+                CourseMode.NO_ID_PROFESSIONAL_MODE, CourseMode.VERIFIED
         ):
             CourseModeFactory.create(mode_slug=mode, course_id=self.course.id)  # pylint: disable=no-member
 
@@ -254,11 +255,11 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
             'reason': ''
         }, r'User \w+ is not enrolled with mode ' + CourseMode.HONOR),
         ({
-            'course_id': None,
+            'course_id': 'course-v1:TestX+T101+2015',
             'old_mode': CourseMode.AUDIT,
             'new_mode': CourseMode.CREDIT_MODE,
-            'reason': ''
-        }, "Specified course mode '{}' unavailable".format(CourseMode.CREDIT_MODE))
+            'reason': 'Enrollment cannot be changed to credit mode'
+        }, '')
     )
     @ddt.unpack
     def test_change_enrollment_bad_data(self, data, error_message):

@@ -86,6 +86,8 @@ class EnrollmentSupportListView(GenericAPIView):
                     username=user.username,
                     old_mode=old_mode
                 ))
+            if new_mode == CourseMode.CREDIT_MODE:
+                return HttpResponseBadRequest(u'Enrollment cannot be changed to credit mode.')
         except KeyError as err:
             return HttpResponseBadRequest(u'The field {} is required.'.format(err.message))
         except InvalidKeyError:
