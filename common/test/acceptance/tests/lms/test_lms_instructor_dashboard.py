@@ -45,6 +45,30 @@ class BaseInstructorDashboardTest(EventsTestMixin, UniqueCourseTest):
         instructor_dashboard_page.visit()
         return instructor_dashboard_page
 
+@attr('a11y')
+class LMSInstructorDashboardA11yTest(BaseInstructorDashboardTest):
+    """
+    Instructor dashboard base accessibility test.
+    """
+    def setUp(self):
+        super(LMSInstructorDashboardA11yTest, self).setUp()
+        self.course_fixture = CourseFixture(**self.course_info).install()
+        self.log_in_as_instructor()
+        self.instructor_dashboard_page = self.visit_instructor_dashboard()
+
+    def test_instructor_dashboard_a11y(self):
+        # a11y test added on 2 Jun 2016, but mostly disabled as there's a slew
+        # of issues on the Instructor Dashboard. We should aim to resolve these
+        # before 2 October 2016, and include the below exclusions.
+        self.instructor_dashboard_page.a11y_audit.config.set_scope()
+        self.instructor_dashboard_page.a11y_audit.config.set_rules({
+            "ignore": [
+                'link-href',
+                'data-table',
+            ]
+        })
+        self.instructor_dashboard_page.a11y_audit.check_for_accessibility_errors()
+
 
 @ddt.ddt
 class BulkEmailTest(BaseInstructorDashboardTest):
