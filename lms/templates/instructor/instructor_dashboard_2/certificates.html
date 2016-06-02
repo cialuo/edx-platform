@@ -113,7 +113,7 @@ from openedx.core.djangolib.markup import HTML, Text
         <h3 class="hd hd-3">${_("Regenerate Certificates")}</h3>
         <form id="certificate-regenerating-form" method="post" action="${section_data['urls']['start_certificate_regeneration']}">
             <p class="under-heading">
-                ${Text(_('To regenerate certificates for your course, choose the learners who will receive regenerated certificates and click Regenerate Certificates.'))}
+                ${_('To regenerate certificates for your course, choose the learners who will receive regenerated certificates and click Regenerate Certificates.')}
             </p>
 
                 <label style="display: inline" for="certificate_status_${section_data['status'].downloadable}">
