@@ -159,7 +159,7 @@ class EnrollmentSupportListView(GenericAPIView):
     @staticmethod
     def get_course_modes(course_key):
         """
-        Returns a list of the all modes including expired modes for a given course id
+        Returns a list of all modes including expired modes for a given course id
 
         Arguments:
             course_id (CourseKey): Search for course modes for this course.

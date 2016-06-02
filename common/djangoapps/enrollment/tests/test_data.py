@@ -263,34 +263,32 @@ class EnrollmentDataTest(ModuleStoreTestCase):
         self.assertIsNone(enrollment)
 
     def test_get_course_with_expired_mode_included(self):
-        """ Verify that method returns expired modes if include_expired
-        is true. """
+        """Verify that method returns expired modes if include_expired
+        is true."""
         modes = ['honor', 'verified', 'audit']
         self._create_course_modes(modes, course=self.course)
-        # Change verified mode expiration.
-        mode = CourseMode.objects.get(course_id=self.course.id, mode_slug=CourseMode.VERIFIED)
-        mode.expiration_datetime = datetime.datetime(year=1970, month=1, day=1, tzinfo=UTC)
-        mode.save()
-
-        result_course = data.get_course_enrollment_info(unicode(self.course.id), include_expired=True)
-        result_slugs = [mode['slug'] for mode in result_course['course_modes']]
-        for course_mode in modes:
-            self.assertIn(course_mode, result_slugs)
+        self._update_verified_mode_as_expired(self.course.id)
+        self.assert_enrollment_modes(modes, True)
 
     def test_get_course_without_expired_mode_included(self):
-        """ Verify that method does not returns expired modes if include_expired
-        is false. """
-
+        """Verify that method does not returns expired modes if include_expired
+        is false."""
         self._create_course_modes(['honor', 'verified', 'audit'], course=self.course)
-        # Change verified mode expiration.
-        mode = CourseMode.objects.get(course_id=self.course.id, mode_slug=CourseMode.VERIFIED)
+        self._update_verified_mode_as_expired(self.course.id)
+        self.assert_enrollment_modes(['audit', 'honor'], False)
+
+    def _update_verified_mode_as_expired(self, course_id):
+        """Change verified mode expiration."""
+        mode = CourseMode.objects.get(course_id=course_id, mode_slug=CourseMode.VERIFIED)
         mode.expiration_datetime = datetime.datetime(year=1970, month=1, day=1, tzinfo=UTC)
         mode.save()
 
-        # It will not return the verified mode.
-        result_course = data.get_course_enrollment_info(unicode(self.course.id), include_expired=False)
+    def assert_enrollment_modes(self, expected_modes, include_expired):
+        """Get enrollment enrollment data and assert response with expected modes."""
+        result_course = data.get_course_enrollment_info(unicode(self.course.id), include_expired=include_expired)
         result_slugs = [mode['slug'] for mode in result_course['course_modes']]
-        for course_mode in ['audit', 'honor']:
+        for course_mode in expected_modes:
             self.assertIn(course_mode, result_slugs)
 
-        self.assertNotIn('verified', result_slugs)
+        if not include_expired:
+            self.assertNotIn('verified', result_slugs)
