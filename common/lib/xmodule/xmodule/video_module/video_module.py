@@ -38,7 +38,7 @@ from xmodule.exceptions import NotFoundError
 from xmodule.contentstore.content import StaticContent
 
 from .transcripts_utils import VideoTranscriptsMixin, Transcript, get_html5_ids
-from .video_utils import create_youtube_string, get_poster, rewrite_video_url
+from .video_utils import create_youtube_string, get_poster, rewrite_video_url, exception_message_for_xml
 from .bumper_utils import bumperize
 from .video_xfields import VideoFields
 from .video_handlers import VideoStudentViewHandlers, VideoStudioViewHandlers
@@ -563,20 +563,17 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
                 if key in self.fields and self.fields[key].is_set_on(self):
                     try:
                         xml.set(key, unicode(value))
-                    except (ValueError, UnicodeDecodeError) as exception:
-                        exception_message = "Block-location:{location}, Key:{key}, Value:{value}".format(
-                            location=unicode(self.location),
-                            key=key,
-                            value=value
-                        )
+                    except UnicodeDecodeError:
+                        exception_message = exception_message_for_xml(self.location, key, value)
                         log.exception(exception_message)
+                        # If exception is UnicodeDecodeError set value using unicode 'utf-8' scheme.
+                        log.info("Setting xml value using 'utf-8' scheme.")
+                        xml.set(key, unicode(value, 'utf-8'))
+                    except ValueError:
+                        exception_message = exception_message_for_xml(self.location, key, value)
+                        log.exception(exception_message)
+                        raise
 
-                        # If exception is UnicodeDecodeError then set value using unicode 'utf-8' scheme.
-                        if type(exception) == UnicodeDecodeError:
-                            log.info("Setting xml value using 'utf-8' scheme.")
-                            xml.set(key, unicode(value, 'utf-8'))
-                        else:
-                            raise
 
         for source in self.html5_sources:
             ele = etree.Element('source')

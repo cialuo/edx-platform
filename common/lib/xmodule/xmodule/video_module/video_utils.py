@@ -98,6 +98,15 @@ def get_poster(video):
     return poster
 
 
+def exception_message_for_xml(location, key, value):
+    exception_message = "Block-location:{location}, Key:{key}, Value:{value}".format(
+        location=unicode(location),
+        key=key,
+        value=value
+    )
+    return exception_message
+
+
 def set_query_parameter(url, param_name, param_value):
     """
     Given a URL, set or replace a query parameter and return the
