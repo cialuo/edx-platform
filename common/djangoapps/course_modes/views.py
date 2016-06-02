@@ -91,9 +91,12 @@ class ChooseModeView(View):
             redirect_url = reverse('verify_student_start_flow', kwargs={'course_id': unicode(course_key)})
             if ecommerce_service.is_enabled(request.user):
                 professional_mode = modes.get(CourseMode.NO_ID_PROFESSIONAL_MODE) or modes.get(CourseMode.PROFESSIONAL)
-                if professional_mode.sku:
+                purchase_workflow = request.GET.get("purchase_workflow", "single")
+                sku_to_use = None
+                if purchase_workflow == "single" and professional_mode.sku:
                     redirect_url = ecommerce_service.checkout_page_url(professional_mode.sku)
-
+                if purchase_workflow == "bulk" and professional_mode.bulk_sku:
+                    redirect_url = ecommerce_service.checkout_page_url(professional_mode.bulk_sku)
             return redirect(redirect_url)
 
         # If there isn't a verified mode available, then there's nothing
